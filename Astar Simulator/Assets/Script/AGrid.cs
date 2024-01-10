@@ -32,9 +32,44 @@ public class AGrid : MonoBehaviour
             {
                 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
                 bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-                grid[x, y] = new ANode(walkable, worldPoint);
+                grid[x, y] = new ANode(walkable, worldPoint, x, y);
             }
         }
+    }
+
+    public List<ANode> GetNeighbours(ANode node)
+    {
+        List<ANode> neighbours = new List<ANode>();
+        for(int x = -1; x <= -1; x++)
+        {
+            for(int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0) continue;
+
+                int checkX = node.gridX + x;
+                int checkY = node.gridY + y;
+
+                if(checkX >= 0 && checkX < gridsizeX && checkY >= 0 && checkY < gridsizeY)
+                {
+                    neighbours.Add(grid[x, y]);
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
+    public ANode GetNodeFromWorldPoint(Vector3 worldPosition)
+    {
+        float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
+        float percentY = (worldPosition.y + gridWorldSize.y / 2) / gridWorldSize.y;
+        percentX = Mathf.Clamp01(percentX);
+        percentY = Mathf.Clamp01(percentY);
+
+        int x = Mathf.RoundToInt((gridsizeX - 1) * percentX);
+        int y = Mathf.RoundToInt((gridsizeY - 1) * percentY);
+
+        return grid[x, y];
     }
 
     private void OnDrawGizmos()

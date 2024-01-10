@@ -6,10 +6,19 @@ public class ANode : MonoBehaviour
 {
     public bool isWalkable;
     public Vector3 worldPos;
+    public int gridX;
+    public int gridY;
 
-    public ANode(bool nWalkable, Vector3 nWorldPos)
+    public double gCost;
+    public double hCost;
+    public double fCost;
+    public ANode parentNode;
+
+    public ANode(bool nWalkable, Vector3 nWorldPos, int nGridX, int nGridY)
     {
         isWalkable = nWalkable;
         worldPos = nWorldPos;
+        gridX = nGridX;
+        gridY = nGridY;
     }
 }
