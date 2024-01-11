@@ -13,7 +13,7 @@ public class AGrid : MonoBehaviour
     int gridsizeX;
     int gridsizeY;
 
-    private void Start()
+    private void Awake()
     {
         nodeDiameter = nodeRadius * 2;
         gridsizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
@@ -62,12 +62,14 @@ public class AGrid : MonoBehaviour
     public ANode GetNodeFromWorldPoint(Vector3 worldPosition)
     {
         float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
-        float percentY = (worldPosition.y + gridWorldSize.y / 2) / gridWorldSize.y;
+        float percentY = (worldPosition.z + gridWorldSize.y / 2) / gridWorldSize.y;
         percentX = Mathf.Clamp01(percentX);
         percentY = Mathf.Clamp01(percentY);
 
         int x = Mathf.RoundToInt((gridsizeX - 1) * percentX);
         int y = Mathf.RoundToInt((gridsizeY - 1) * percentY);
+
+        Debug.Log(string.Format("Find [{0}, {1}]", x, y));
 
         return grid[x, y];
     }

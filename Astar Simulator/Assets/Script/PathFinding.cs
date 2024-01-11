@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -5,20 +6,20 @@ using UnityEngine;
 
 public class PathFinding : MonoBehaviour
 {
+    PathRequestManager requestManager;
     AGrid grid;
-
-    public Transform startObject;
-    public Transform targetObject;
 
     private void Awake()
     {
+        requestManager = GetComponent<PathRequestManager>();
         grid = GetComponent<AGrid>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartFindPath(Vector3 startPos, Vector3 endPos)
     {
-        FindPath(startObject.position, targetObject.position);
+        Debug.Log(startPos);
+        Debug.Log(endPos);
+        StartCoroutine(FindPath(startPos, endPos));
     }
 
     double GetDistanceCost(ANode node1, ANode node2)
@@ -26,9 +27,26 @@ public class PathFinding : MonoBehaviour
         return Mathf.Sqrt(Mathf.Pow(node1.gridX - node2.gridX, 2) + Mathf.Pow(node1.gridY - node2.gridY, 2));
     }
 
-    void TracePath(ANode startNode, ANode endNode)
+    Vector3[] SimplifyPath(List<ANode> path)
     {
-        List <ANode> path = new List <ANode>();
+        List<Vector3> waypoints = new List<Vector3>();
+        Vector2 directionOld = Vector2.zero;
+
+        for(int i = 1; i < path.Count; i++)
+        {
+            Vector2 directionNew = new Vector2(path[i-1].gridX - path[i].gridX, path[i-1].gridY - path[i].gridY);
+            if(directionNew != directionOld)
+            {
+                waypoints.Add(path[i].worldPos);
+            }
+            directionOld = directionNew;
+        }
+        return waypoints.ToArray();
+    }
+
+    Vector3[] TracePath(ANode startNode, ANode endNode)
+    {
+        List <ANode> path = new List<ANode>();
         ANode currentNode = endNode;
 
         while (currentNode != startNode)
@@ -36,12 +54,16 @@ public class PathFinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.parentNode;
         }
-
-        path.Reverse();
+        Vector3[] waypoints = SimplifyPath(path);
+        Array.Reverse(waypoints);
+        return waypoints;
     }
 
-    void FindPath(Vector3 startPos, Vector3 targetPos)
+    IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
     {
+        Vector3[] waypoints = new Vector3[0];
+        bool pathSuccess = false;
+
         ANode startNode = grid.GetNodeFromWorldPoint(startPos);
         ANode targetNode = grid.GetNodeFromWorldPoint(targetPos);
 
@@ -65,15 +87,19 @@ public class PathFinding : MonoBehaviour
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            if(currentNode == targetNode)
+            Debug.Log(string.Format("{0}, {1}", currentNode.gridX, currentNode.gridY));
+            Debug.Log(string.Format("{0}, {1}", targetNode.gridX, targetNode.gridY));
+
+            if (currentNode == targetNode)
             {
                 TracePath(startNode, targetNode);
-                return;
+                break;
             }
-
-            foreach(ANode node in grid.GetNeighbours(currentNode))
+            
+            foreach (ANode node in grid.GetNeighbours(currentNode))
             {
-                if(!node.isWalkable || closedList.Contains(node))
+                
+                if (!node.isWalkable || closedList.Contains(node))
                 {
                     continue;
                 }
@@ -96,5 +122,12 @@ public class PathFinding : MonoBehaviour
                 }
             }    
         }
+        yield return null;
+        if(pathSuccess)
+        {
+            waypoints = TracePath(startNode, targetNode);
+        }
+
+        requestManager.FinishedProcessingPath(waypoints, pathSuccess);
     }
 }
