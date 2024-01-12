@@ -40,7 +40,7 @@ public class AGrid : MonoBehaviour
     public List<ANode> GetNeighbours(ANode node)
     {
         List<ANode> neighbours = new List<ANode>();
-        for(int x = -1; x <= -1; x++)
+        for(int x = -1; x <= 1; x++)
         {
             for(int y = -1; y <= 1; y++)
             {
@@ -51,7 +51,7 @@ public class AGrid : MonoBehaviour
 
                 if(checkX >= 0 && checkX < gridsizeX && checkY >= 0 && checkY < gridsizeY)
                 {
-                    neighbours.Add(grid[x, y]);
+                    neighbours.Add(grid[checkX, checkY]);
                 }
             }
         }
