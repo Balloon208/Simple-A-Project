@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public Transform target;
+    // public Transform target;
+    private Camera mainCamera;
+
     float speed = 20;
     Vector3[] path;
     int targetIndex;
@@ -23,6 +25,7 @@ public class Unit : MonoBehaviour
     {
         Vector3 currentWaypoint = path[0];
 
+        targetIndex = 0;
         while(true)
         {
             if(transform.position == currentWaypoint)
@@ -41,12 +44,25 @@ public class Unit : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+        // PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
         
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            // 마우스로 찍은 위치의 좌표 값을 가져온다
+            if (Physics.Raycast(ray, out hit, 10000f))
+            {
+                StopAllCoroutines();
+                PathRequestManager.RequestPath(transform.position, hit.point, OnPathFound);
+            }
+        }
     }
 }

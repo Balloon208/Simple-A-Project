@@ -17,14 +17,19 @@ public class PathFinding : MonoBehaviour
 
     public void StartFindPath(Vector3 startPos, Vector3 endPos)
     {
-        Debug.Log(startPos);
-        Debug.Log(endPos);
+        Debug.Log(string.Format("StartPos : {0}", startPos));
+        Debug.Log(string.Format("EndPos : {0}", endPos));
         StartCoroutine(FindPath(startPos, endPos));
     }
 
     double GetDistanceCost(ANode node1, ANode node2)
     {
-        return Mathf.Sqrt(Mathf.Pow(node1.gridX - node2.gridX, 2) + Mathf.Pow(node1.gridY - node2.gridY, 2));
+        int distX = Mathf.Abs(node1.gridX - node2.gridX);
+        int distY = Mathf.Abs(node1.gridY - node2.gridY);
+
+        if(distX > distY)
+            return 1.414 * distY + 1.0 * (distX - distY);
+        return 1.414 * distX + 1.0 * (distY - distX);
     }
 
     Vector3[] SimplifyPath(List<ANode> path)
@@ -56,6 +61,8 @@ public class PathFinding : MonoBehaviour
         }
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
+
+        Debug.Log(string.Format("WayPoints : {0}", waypoints));
         return waypoints;
     }
 
@@ -106,15 +113,13 @@ public class PathFinding : MonoBehaviour
                         continue;
                     }
 
-                    double ng = node.gCost + 1.0f;
-                    double nh = GetDistanceCost(node, targetNode);
-                    double nf = ng + nh;
+                    double newCurrentToNeighbourCost = currentNode.gCost + GetDistanceCost(currentNode, node);
 
-                    if (node.fCost > nf || !openList.Contains(node)) // 기존 C++ 의 if(cellDetails[ny][nx].f == INF || cellDetails[ny][nx].f > nf) 부분
+
+                    if (newCurrentToNeighbourCost < node.gCost || !openList.Contains(node)) // 기존 C++ 의 if(cellDetails[ny][nx].f == INF || cellDetails[ny][nx].f > nf) 부분
                     {
-                        node.gCost = ng;
-                        node.hCost = nh;
-                        node.fCost = nf;
+                        node.gCost = newCurrentToNeighbourCost;
+                        node.hCost = GetDistanceCost(node, targetNode);
                         node.parentNode = currentNode;
 
                         if (!openList.Contains(node))
