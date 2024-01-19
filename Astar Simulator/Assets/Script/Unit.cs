@@ -25,6 +25,7 @@ public class Unit : MonoBehaviour
     {
         Vector3 currentWaypoint = path[0];
 
+        targetIndex = 0;
         while(true)
         {
             if(transform.position == currentWaypoint)
@@ -59,6 +60,7 @@ public class Unit : MonoBehaviour
             // 마우스로 찍은 위치의 좌표 값을 가져온다
             if (Physics.Raycast(ray, out hit, 10000f))
             {
+                StopAllCoroutines();
                 PathRequestManager.RequestPath(transform.position, hit.point, OnPathFound);
             }
         }

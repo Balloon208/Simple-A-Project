@@ -17,8 +17,8 @@ public class PathFinding : MonoBehaviour
 
     public void StartFindPath(Vector3 startPos, Vector3 endPos)
     {
-        Debug.Log(startPos);
-        Debug.Log(endPos);
+        Debug.Log(string.Format("StartPos : {0}", startPos));
+        Debug.Log(string.Format("EndPos : {0}", endPos));
         StartCoroutine(FindPath(startPos, endPos));
     }
 
@@ -61,6 +61,8 @@ public class PathFinding : MonoBehaviour
         }
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
+
+        Debug.Log(string.Format("WayPoints : {0}", waypoints));
         return waypoints;
     }
 
