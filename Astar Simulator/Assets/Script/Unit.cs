@@ -55,7 +55,7 @@ public class Unit : MonoBehaviour
         RaycastHit hit;
         
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             // 마우스로 찍은 위치의 좌표 값을 가져온다
             if (Physics.Raycast(ray, out hit, 10000f))
