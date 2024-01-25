@@ -11,6 +11,8 @@ public class Unit : MonoBehaviour
     Vector3[] path;
     int targetIndex;
 
+    public Material[] mat = new Material[2];
+
     public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
     {
         if (pathSuccessful)
@@ -51,11 +53,16 @@ public class Unit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+    }
+
+    public void Move()
+    {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        
 
-        if (Input.GetMouseButtonDown(0))
+
+        //if (Input.GetMouseButtonDown(1))
         {
             // 마우스로 찍은 위치의 좌표 값을 가져온다
             if (Physics.Raycast(ray, out hit, 10000f))
